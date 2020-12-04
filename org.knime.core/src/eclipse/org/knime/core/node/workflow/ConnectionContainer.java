@@ -88,6 +88,8 @@ public class ConnectionContainer implements ConnectionProgressListener {
     private final ConnectionType m_type;
     private boolean m_isFlowVariablePortConnection;
 
+    private ConnectionProgress m_progress = null;
+
     /**
      * Creates new connection.
      *
@@ -121,7 +123,12 @@ public class ConnectionContainer implements ConnectionProgressListener {
      * @return the uiInfo
      */
     public ConnectionUIInformation getUIInfo() {
-        return m_uiInfo;
+        if (m_uiInfo != null && m_progress != null) {
+            return ConnectionUIInformation.builder(m_uiInfo).setLabel(m_progress.getMessage())
+                .inProgress(m_progress.inProgress()).build();
+        } else {
+            return m_uiInfo;
+        }
     }
 
     /**
@@ -237,6 +244,9 @@ public class ConnectionContainer implements ConnectionProgressListener {
         // set us as source
         ConnectionProgressEvent event =
                 new ConnectionProgressEvent(this, pe.getConnectionProgress());
+
+        m_progress = event.getConnectionProgress();
+
         // forward the event
         notifyProgressListeners(event);
     }

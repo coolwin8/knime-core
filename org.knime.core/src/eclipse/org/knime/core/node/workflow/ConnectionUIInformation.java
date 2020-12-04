@@ -49,6 +49,7 @@ package org.knime.core.node.workflow;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Optional;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -63,12 +64,18 @@ public class ConnectionUIInformation {
 
     private final int[][] m_bendpoints;
 
+    private final boolean m_isInProgress;
+
+    private final String m_label;
+
 
     ConnectionUIInformation(final Builder connectionUIInfo) {
         m_bendpoints = new int[connectionUIInfo.m_bendpoints.size()][];
         for (int i = 0; i < m_bendpoints.length; i++) {
             m_bendpoints[i] = connectionUIInfo.m_bendpoints.get(i).clone();
         }
+        m_isInProgress = connectionUIInfo.m_isInProgress;
+        m_label = connectionUIInfo.m_label;
     }
 
     /**
@@ -88,6 +95,24 @@ public class ConnectionUIInformation {
      */
     public int[][] getAllBendpoints() {
         return m_bendpoints.clone();
+    }
+
+    /**
+     * Determines whether there is progress, i.e. data currently being passed through the connection (aka streaming).
+     *
+     * @return <code>true</code> if in progress
+     * @since 4.3
+     */
+    public boolean isInProgress() {
+        return m_isInProgress;
+    }
+
+    /**
+     * @return an optional label for the connection
+     * @since 4.3
+     */
+    public Optional<String> getLabel() {
+        return Optional.ofNullable(m_label);
     }
 
     /**
@@ -135,6 +160,10 @@ public class ConnectionUIInformation {
 
         private ArrayList<int[]> m_bendpoints = new ArrayList<int[]>();
 
+        private boolean m_isInProgress = false;
+
+        private String m_label = null;
+
         /** Builder with defaults. */
         Builder() {
         }
@@ -148,6 +177,8 @@ public class ConnectionUIInformation {
             for (int i = 0; i < connectionUIInfo.m_bendpoints.length; i++) {
                 m_bendpoints.add(connectionUIInfo.m_bendpoints[i].clone());
             }
+            m_isInProgress = connectionUIInfo.m_isInProgress;
+            m_label = connectionUIInfo.m_label;
             return this;
         }
 
@@ -201,6 +232,29 @@ public class ConnectionUIInformation {
          */
         public Builder removeBendpoint(final int index) {
             m_bendpoints.remove(index);
+            return this;
+        }
+
+        /**
+         * Sets whether the connection is in progress (i.e. data flowing through it, aka streaming).
+         *
+         * @param isInProgress
+         * @return this
+         * @since 4.3
+         */
+        public Builder inProgress(final boolean isInProgress) {
+            m_isInProgress = isInProgress;
+            return this;
+        }
+
+        /**
+         * Sets a label for the connection.
+         * @param label
+         * @return this
+         * @since 4.3
+         */
+        public Builder setLabel(final String label) {
+            m_label = label;
             return this;
         }
 
